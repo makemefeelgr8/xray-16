@@ -8,6 +8,12 @@ Required Environment: Ubuntu 20.04
 1. Clone original repo and build it for linux:
 https://github.com/OpenXRay/xray-16/wiki/%5BEN%5D-How-to-build-and-setup-on-Linux
 
+1.1. Create links to required tools:
+
+cd xray-16/bin/x64/minilua
+sudo ln xray-16/bin/x64/minilua /bin/minilua
+sudo ln xray-16/bin/x64/buildvm /bin/buildvm
+
 2. Clone this repository into a different folder.
 
 git clone https://github.com/makemefeelgr8/xray-16.git xray-android
