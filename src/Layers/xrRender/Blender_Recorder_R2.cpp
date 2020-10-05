@@ -5,7 +5,7 @@
 #include "Blender_Recorder.h"
 #include "Blender.h"
 
-void fix_texture_name(LPSTR fn);
+void fix_texture_name(pstr fn);
 
 void CBlender_Compile::r_Pass(std::pair<cpcstr, cpcstr> _vs, LPCSTR _ps, bool bFog, BOOL bZtest, BOOL bZwrite,
     BOOL bABlend, D3DBLEND abSRC, D3DBLEND abDST, BOOL aTest, u32 aRef)
@@ -62,7 +62,7 @@ void CBlender_Compile::r_Constant(LPCSTR name, R_constant_setup* s)
 
 void CBlender_Compile::r_ColorWriteEnable(bool cR, bool cG, bool cB, bool cA)
 {
-    BYTE Mask = 0;
+    u8 Mask = 0;
     Mask |= cR ? D3DCOLORWRITEENABLE_RED : 0;
     Mask |= cG ? D3DCOLORWRITEENABLE_GREEN : 0;
     Mask |= cB ? D3DCOLORWRITEENABLE_BLUE : 0;

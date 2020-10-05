@@ -241,7 +241,7 @@ Ivector vpack(const Fvector& src)
     return ipck;
 }
 
-void generate_jitter(DWORD* dest, u32 elem_count)
+void generate_jitter(u32* dest, u32 elem_count)
 {
     const int cmax = 8;
     svector<Ivector2, cmax> samples;
@@ -269,13 +269,13 @@ void generate_jitter(DWORD* dest, u32 elem_count)
 void manually_assign_texture(ref_shader& shader, pcstr dx10textureName, pcstr rendertargetTextureName)
 {
     SPass& pass = *shader->E[0]->passes[0];
-    ref_constant constant = pass.constants->get(dx10textureName);
-    if (!constant)
-    {
-        Msg("! Trying to manually assign a texture[%s] to [%s] but %s doesn't exist.",
-            rendertargetTextureName, dx10textureName, dx10textureName);
+    if (!pass.constants)
         return;
-    }
+
+    const ref_constant constant = pass.constants->get(dx10textureName);
+    if (!constant)
+        return;
+
     const auto index = constant->samp.index;
     pass.T->create_texture(index, rendertargetTextureName, false);
 }
@@ -412,8 +412,8 @@ CRenderTarget::CRenderTarget()
         }
 
         // generic(LDR) RTs
-        rt_Generic_0.create(r2_RT_generic0, w, h, D3DFMT_A8R8G8B8, SampleCount);
-        rt_Generic_1.create(r2_RT_generic1, w, h, D3DFMT_A8R8G8B8, SampleCount);
+        rt_Generic_0.create(r2_RT_generic0, w, h, D3DFMT_A8R8G8B8, 1);
+        rt_Generic_1.create(r2_RT_generic1, w, h, D3DFMT_A8R8G8B8, 1);
         rt_Generic.create(r2_RT_generic, w, h, D3DFMT_A8R8G8B8, 1);
 
         if (!RImplementation.o.dx10_msaa)
@@ -423,8 +423,8 @@ CRenderTarget::CRenderTarget()
         }
         else
         {
-            rt_Generic_0_r.create(r2_RT_generic0_r, w, h, D3DFMT_A8R8G8B8, 1);
-            rt_Generic_1_r.create(r2_RT_generic1_r, w, h, D3DFMT_A8R8G8B8, 1);
+            rt_Generic_0_r.create(r2_RT_generic0_r, w, h, D3DFMT_A8R8G8B8, SampleCount);
+            rt_Generic_1_r.create(r2_RT_generic1_r, w, h, D3DFMT_A8R8G8B8, SampleCount);
         }
         //	Igor: for volumetric lights
         // rt_Generic_2.create			(r2_RT_generic2,w,h,D3DFMT_A8R8G8B8		);
@@ -561,7 +561,6 @@ CRenderTarget::CRenderTarget()
     if (RImplementation.o.dx10_msaa)
     {
         CBlender_msaa TempBlender;
-
         s_mark_msaa_edges.create(&TempBlender, "null");
     }
 
@@ -785,7 +784,7 @@ CRenderTarget::CRenderTarget()
                 {
                     for (u32 x = 0; x < TEX_material_LdotN; x++)
                     {
-                        u16* p = (u16*)(LPBYTE(subData.pSysMem) + slice * subData.SysMemSlicePitch +
+                        u16* p = (u16*)((u8*)(subData.pSysMem) + slice * subData.SysMemSlicePitch +
                             y * subData.SysMemPitch + x * 2);
                         float ld = float(x) / float(TEX_material_LdotN - 1);
                         float ls = float(y) / float(TEX_material_LdotH - 1) + EPS_S;
@@ -898,11 +897,11 @@ CRenderTarget::CRenderTarget()
             {
                 for (u32 x = 0; x < TEX_jitter; x++)
                 {
-                    DWORD data[TEX_jitter_count - 1];
+                    u32 data[TEX_jitter_count - 1];
                     generate_jitter(data, TEX_jitter_count - 1);
                     for (u32 it = 0; it < TEX_jitter_count - 1; it++)
                     {
-                        u32* p = (u32*)(LPBYTE(subData[it].pSysMem) + y * subData[it].SysMemPitch + x * 4);
+                        u32* p = (u32*)((u8*)(subData[it].pSysMem) + y * subData[it].SysMemPitch + x * 4);
 
                         *p = data[it];
                     }
@@ -963,7 +962,7 @@ CRenderTarget::CRenderTarget()
                     float dist = ::Random.randF(0.0f, 1.0f);
 
                     float* p =
-                        (float*)(LPBYTE(subData[it].pSysMem) + y * subData[it].SysMemPitch + x * 4 * sizeof(float));
+                        (float*)((u8*)(subData[it].pSysMem) + y * subData[it].SysMemPitch + x * 4 * sizeof(float));
                     *p = (float)(_cos(angle));
                     *(p + 1) = (float)(_sin(angle));
                     *(p + 2) = (float)(dist);

@@ -37,7 +37,7 @@ void CRender::level_Load(IReader* fs)
             if (0 == n[0])
                 continue;
             xr_strcpy(n_sh, n);
-            LPSTR delim = strchr(n_sh, '/');
+            pstr delim = strchr(n_sh, '/');
             *delim = 0;
             xr_strcpy(n_tlist, delim + 1);
             Shaders[i] = Resources->Create(n_sh, n_tlist);
@@ -244,7 +244,7 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
 
             // Create and fill
             _VB[i].Create(vCount * vSize);
-            BYTE* pData = static_cast<BYTE*>(_VB[i].Map());
+            u8* pData = static_cast<u8*>(_VB[i].Map());
             fs->r(pData, vCount * vSize);
             //			CopyMemory			(pData,fs->pointer(),vCount*vSize);	//.???? copy while skip T&B
             _VB[i].Unmap(true); // upload vertex data
@@ -273,7 +273,7 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
 
             // Create and fill
             _IB[i].Create(iCount * 2);
-            BYTE* pData = static_cast<BYTE*>(_IB[i].Map());
+            u8* pData = static_cast<u8*>(_IB[i].Map());
             //			CopyMemory			(pData,fs->pointer(),iCount*2);
             fs->r(pData, iCount * 2);
             _IB[i].Unmap(true); // upload index data

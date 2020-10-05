@@ -2,6 +2,7 @@
 
 #include "Layers/xrRender/D3DXRenderBase.h"
 #include "Layers/xrRender/r__occlusion.h"
+#include "Layers/xrRender/r__sync_point.h"
 
 #include "Layers/xrRender/PSLibrary.h"
 
@@ -120,8 +121,6 @@ public:
         s32 s_used;
         s32 s_merged;
         s32 s_finalclip;
-        u32 o_queries;
-        u32 o_culled;
         u32 ic_total;
         u32 ic_culled;
 
@@ -135,8 +134,6 @@ public:
             s_used = 0;
             s_merged = 0;
             s_finalclip = 0;
-            o_queries = 0;
-            o_culled = 0;
             ic_total = 0;
             ic_culled = 0;
         }
@@ -187,8 +184,7 @@ public:
     float o_hemi;
     float o_hemi_cube[CROS_impl::NUM_FACES];
     float o_sun;
-    ID3DQuery* q_sync_point[CHWCaps::MAX_GPUS];
-    u32 q_sync_count;
+    R_sync_point q_sync_point;
 
     bool m_bMakeAsyncSS;
     bool m_bFirstFrameAfterReset; // Determines weather the frame is the first after resetting device.

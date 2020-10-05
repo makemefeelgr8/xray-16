@@ -601,7 +601,7 @@ bool IPureClient::Connect(pcstr options)
             string64 EnumData;
             EnumData[0] = 0;
             xr_strcat(EnumData, "ToConnect");
-            DWORD EnumSize = xr_strlen(EnumData) + 1;
+            u32 EnumSize = xr_strlen(EnumData) + 1;
             // We now have the host address so lets enum
             u32 c_port = psCL_Port;
             HRESULT res = S_FALSE;
@@ -977,7 +977,7 @@ void IPureClient::SendTo_LL(void* data, u32 size, u32 dwFlags, u32 dwTimeout)
     DPN_BUFFER_DESC desc;
 
     desc.dwBufferSize = size;
-    desc.pBufferData = (BYTE*)data;
+    desc.pBufferData = (u8*)data;
 
     net_Statistic.dwBytesSended += size;
 
@@ -1098,7 +1098,7 @@ void IPureClient::Sync_Thread()
             DPN_BUFFER_DESC desc;
             DPNHANDLE hAsync = 0;
             desc.dwBufferSize = sizeof(clPing);
-            desc.pBufferData = LPBYTE(&clPing);
+            desc.pBufferData = (u8*)(&clPing);
             if (nullptr == NET || net_Disconnected)
                 break;
 
@@ -1198,7 +1198,7 @@ IPureClient::HOST_NODE::~HOST_NODE() noexcept
     xr_delete(pdpAppDesc);
 }
 
-bool IPureClient::GetServerAddress(ip_address& pAddress, DWORD* pPort)
+bool IPureClient::GetServerAddress(ip_address& pAddress, u32* pPort)
 {
     *pPort = 0;
     if (!net_Address_server)
@@ -1224,7 +1224,7 @@ bool IPureClient::GetServerAddress(ip_address& pAddress, DWORD* pPort)
     //pAddress[2] = (char)(*(struct in_addr *)*pHostEnt->h_addr_list).s_lh;
     //pAddress[3] = (char)(*(struct in_addr *)*pHostEnt->h_addr_list).s_impno;
 
-    DWORD dwPort = 0;
+    u32 dwPort = 0;
     DWORD dwPortSize = sizeof(dwPort);
     DWORD dwPortDataType = DPNA_DATATYPE_DWORD;
     CHK_DX(net_Address_server->GetComponentByName(DPNA_KEY_PORT, &dwPort, &dwPortSize, &dwPortDataType));

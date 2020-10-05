@@ -90,9 +90,9 @@ public:
 #endif
     D3D_PRIMITIVE_TOPOLOGY m_PrimitiveTopology;
     ID3DInputLayout* m_pInputLayout;
-    DWORD dummy0; // Padding to avoid warning	
-    DWORD dummy1; // Padding to avoid warning	
-    DWORD dummy2; // Padding to avoid warning	
+    u32 dummy0; // Padding to avoid warning	
+    u32 dummy1; // Padding to avoid warning	
+    u32 dummy2; // Padding to avoid warning	
 #endif
 private:
     // Render-targets
@@ -466,7 +466,7 @@ public:
     ICF void Render(D3DPRIMITIVETYPE T, u32 startV, u32 PC);
 
 #ifdef USE_DX11
-    ICF void Compute(UINT ThreadGroupCountX, UINT ThreadGroupCountY, UINT ThreadGroupCountZ);
+    ICF void Compute(u32 ThreadGroupCountX, u32 ThreadGroupCountY, u32 ThreadGroupCountZ);
 #endif
 
     // Device create / destroy / frame signaling

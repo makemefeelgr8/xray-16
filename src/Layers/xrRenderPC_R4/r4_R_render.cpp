@@ -166,13 +166,13 @@ void CRender::render_menu()
 
     // Main Render
     {
-        Target->u_setrt(Target->rt_Generic_0, 0, 0, Target->rt_MSAADepth->pZRT); // LDR RT
+        Target->u_setrt(Target->rt_Generic_0, 0, 0, Target->get_base_zb()); // LDR RT
         g_pGamePersistent->OnRenderPPUI_main(); // PP-UI
     }
 
     // Distort
     {
-        Target->u_setrt(Target->rt_Generic_1, 0, 0, Target->rt_MSAADepth->pZRT); // Now RT is a distortion mask
+        Target->u_setrt(Target->rt_Generic_1, 0, 0, Target->get_base_zb()); // Now RT is a distortion mask
         RCache.ClearRT(Target->rt_Generic_1, color_rgba(127, 127, 0, 127));
         g_pGamePersistent->OnRenderPPUI_PP(); // PP-UI
     }
@@ -286,28 +286,11 @@ void CRender::Render()
     //*******
     // Sync point
     BasicStats.WaitS.Begin();
-    if (1)
     {
-        CTimer T;
-        T.Start();
-        BOOL result = FALSE;
-        HRESULT hr = S_FALSE;
-        // while	((hr=q_sync_point[q_sync_count]->GetData	(&result,sizeof(result),D3DGETDATA_FLUSH))==S_FALSE) {
-        while ((hr = GetData(q_sync_point[q_sync_count], &result, sizeof(result))) == S_FALSE)
-        {
-            if (!SwitchToThread())
-                Sleep(ps_r2_wait_sleep);
-            if (T.GetElapsed_ms() > 500)
-            {
-                result = FALSE;
-                break;
-            }
-        }
+        q_sync_point.Wait(ps_r2_wait_sleep, ps_r2_wait_timeout);
     }
     BasicStats.WaitS.End();
-    q_sync_count = (q_sync_count + 1) % HW.Caps.iGPUNum;
-    // CHK_DX										(q_sync_point[q_sync_count]->Issue(D3DISSUE_END));
-    CHK_DX(EndQuery(q_sync_point[q_sync_count]));
+    q_sync_point.End();
 
     //******* Main calc - DEFERRER RENDERER
     // Main calc
@@ -411,7 +394,7 @@ void CRender::Render()
         // skybox can be drawn here
         if (0)
         {
-            Target->u_setrt(Target->rt_Generic_0, Target->rt_Generic_1, 0, Target->rt_MSAADepth->pZRT);
+            Target->u_setrt(Target->rt_Generic_0_r, Target->rt_Generic_1_r, 0, Target->rt_MSAADepth->pZRT);
             RCache.set_CullMode(CULL_NONE);
             RCache.set_Stencil(FALSE);
 

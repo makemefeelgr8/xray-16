@@ -160,7 +160,7 @@ Ivector vpack(const Fvector& src)
     return ipck;
 }
 
-void generate_jitter(DWORD* dest, u32 elem_count)
+void generate_jitter(u32* dest, u32 elem_count)
 {
     const int cmax = 8;
     svector<Ivector2, cmax> samples;
@@ -188,13 +188,13 @@ void generate_jitter(DWORD* dest, u32 elem_count)
 void manually_assign_texture(ref_shader& shader, pcstr samplerName, pcstr rendertargetTextureName)
 {
     SPass& pass = *shader->E[0]->passes[0];
-    ref_constant constant = pass.constants->get(samplerName);
-    if (!constant)
-    {
-        Msg("! Trying to manually assign a texture[%s] to [%s] but %s doesn't exist.",
-            rendertargetTextureName, samplerName, samplerName);
+    if (!pass.constants)
         return;
-    }
+
+    const ref_constant constant = pass.constants->get(samplerName);
+    if (!constant)
+        return;
+
     const auto index = constant->samp.index;
     pass.T->create_texture(index, rendertargetTextureName, false);
 }
@@ -487,7 +487,7 @@ CRenderTarget::CRenderTarget()
                 {
                     for (u32 x = 0; x < TEX_material_LdotN; x++)
                     {
-                        u16* p = (u16*)(LPBYTE(R.pBits) + slice * R.SlicePitch + y * R.RowPitch + x * 2);
+                        u16* p = (u16*)((u8*)(R.pBits) + slice * R.SlicePitch + y * R.RowPitch + x * 2);
                         float ld = float(x) / float(TEX_material_LdotN - 1);
                         float ls = float(y) / float(TEX_material_LdotH - 1) + EPS_S;
                         ls *= powf(ld, 1 / 32.f);
@@ -563,11 +563,11 @@ CRenderTarget::CRenderTarget()
             {
                 for (u32 x = 0; x < TEX_jitter; x++)
                 {
-                    DWORD data[TEX_jitter_count - 1];
+                    u32 data[TEX_jitter_count - 1];
                     generate_jitter(data, TEX_jitter_count - 1);
                     for (u32 it2 = 0; it2 < TEX_jitter_count - 1; it2++)
                     {
-                        u32* p = (u32*)(LPBYTE(R[it2].pBits) + y * R[it2].Pitch + x * 4);
+                        u32* p = (u32*)((u8*)(R[it2].pBits) + y * R[it2].Pitch + x * 4);
                         *p = data[it2];
                     }
                 }
@@ -604,7 +604,7 @@ CRenderTarget::CRenderTarget()
                     float dist = ::Random.randF(0.0f, 1.0f);
                     // float dest[4];
 
-                    float* p = (float*)(LPBYTE(R[it].pBits) + y * R[it].Pitch + x * 4 * sizeof(float));
+                    float* p = (float*)((u8*)(R[it].pBits) + y * R[it].Pitch + x * 4 * sizeof(float));
                     *p = (float)(_cos(angle));
                     *(p + 1) = (float)(_sin(angle));
                     *(p + 2) = (float)(dist);

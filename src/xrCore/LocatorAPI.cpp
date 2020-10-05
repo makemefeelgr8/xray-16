@@ -299,7 +299,7 @@ IReader* open_chunk(void* ptr, u32 ID, pcstr archiveName, size_t archiveSize, bo
             VERIFY(res && (read_byte == dwSize));
             if (dwType & CFS_CompressMark)
             {
-                BYTE* dest = nullptr;
+                u8* dest = nullptr;
                 size_t dest_sz = 0;
 
                 if (shouldDecrypt) // Try WW key first
@@ -358,7 +358,7 @@ IReader* open_chunk(int fd, u32 ID, pcstr archiveName, size_t archiveSize, bool 
             VERIFY(read_byte == dwSize);
             if (dwType & CFS_CompressMark)
             {
-                BYTE* dest = nullptr;
+                u8* dest = nullptr;
                 size_t dest_sz = 0;
 
                 if (shouldDecrypt)
@@ -612,7 +612,7 @@ void CLocatorAPI::ProcessOne(pcstr path, const _finddata_t& entry)
             return;
         if (0 == xr_strcmp(entry.name, ".."))
             return;
-        if(path[xr_strlen(path) - 1] != _DELIMITER || path[xr_strlen(path) - 1] != '/')
+        if (path[xr_strlen(path) - 1] != _DELIMITER || path[xr_strlen(path) - 1] != '/')
             xr_strcat(N, DELIMITER);
         Register(N, VFS_STANDARD_FILE, 0, 0, entry.size, entry.size, (u32)entry.time_write);
         Recurse(N);
@@ -772,7 +772,7 @@ bool CLocatorAPI::Recurse(pcstr path)
         rec_files.erase(rec_files.begin() + oldSize, rec_files.end());
     }
     // insert self
-    if (path && path[0] != 0)
+    if (path[0] != '\0')
         Register(path, VFS_STANDARD_FILE, 0, 0, 0, 0, 0);
 
     return true;
@@ -1291,7 +1291,7 @@ void CLocatorAPI::check_cached_files(pstr fname, const size_t& fname_size, const
     xr_strcpy(fname, fname_size, fname_in_cache);
 }
 
-void CLocatorAPI::file_from_cache_impl(IReader*& R, LPSTR fname, const file& desc)
+void CLocatorAPI::file_from_cache_impl(IReader*& R, pstr fname, const file& desc)
 {
     if (desc.size_real < 16 * 1024)
     {
@@ -1302,7 +1302,7 @@ void CLocatorAPI::file_from_cache_impl(IReader*& R, LPSTR fname, const file& des
     R = xr_new<CVirtualFileReader>(fname);
 }
 
-void CLocatorAPI::file_from_cache_impl(CStreamReader*& R, LPSTR fname, const file& desc)
+void CLocatorAPI::file_from_cache_impl(CStreamReader*& R, pstr fname, const file& desc)
 {
     CFileStreamReader* r = xr_new<CFileStreamReader>();
     r->construct(fname, BIG_FILE_READER_WINDOW_SIZE);

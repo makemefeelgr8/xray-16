@@ -89,12 +89,12 @@ public:
 
 typedef struct _PROCESSOR_POWER_INFORMATION
 {
-    ULONG Number;
-    ULONG MaxMhz;
-    ULONG CurrentMhz;
-    ULONG MhzLimit;
-    ULONG MaxIdleState;
-    ULONG CurrentIdleState;
+    u32 Number;
+    u32 MaxMhz;
+    u32 CurrentMhz;
+    u32 MhzLimit;
+    u32 MaxIdleState;
+    u32 CurrentIdleState;
 } PROCESSOR_POWER_INFORMATION, *PPROCESSOR_POWER_INFORMATION;
 
 // Initialized on startup
@@ -103,7 +103,7 @@ XRCORE_API Dmatrix Didentity;
 XRCORE_API CRandom Random;
 
 #if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
-DWORD timeGetTime()
+u32 timeGetTime()
 {
     return SDL_GetTicks();
 }
