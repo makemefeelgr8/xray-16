@@ -124,14 +124,14 @@ include $(BUILD_STATIC_LIBRARY)
 #
 ###########################
 
-include $(CLEAR_VARS)
-
-LOCAL_CPPFLAGS += -std=c++11
-
-LOCAL_SRC_FILES := src/hidapi/android/hid.cpp
-
-LOCAL_MODULE := libhidapi
-LOCAL_LDLIBS := -llog
+#include $(CLEAR_VARS)
+#
+#LOCAL_CPPFLAGS += -std=c++11
+#
+#LOCAL_SRC_FILES := src/hidapi/android/hid.cpp
+#
+#LOCAL_MODULE := libhidapi
+#LOCAL_LDLIBS := -llog
 
 include $(BUILD_SHARED_LIBRARY)
 

@@ -1,0 +1,37 @@
+Follow this manual to build Xray engine for Android OS. Build process produces binaries that can be included into an apk file. Produced binarides does not require an arm64 linux distro, but work on an actual Android OS.
+This is just an experiment, so you should not expect it to work smooth or fit a particular purpose.
+
+Required Environment: Ubuntu 20.04
+
+0. Download Android Studio. Launch it and complete initial setup process. When you see a "Welcome to Android Studio" screen, click "Configure". Open "SDK Tools" tab and make sure both SDK and CMake options are selected. Click OK to install required packages.
+
+1. Clone original repo and build it for linux:
+https://github.com/OpenXRay/xray-16/wiki/%5BEN%5D-How-to-build-and-setup-on-Linux
+
+2. Clone this repository into a different folder.
+
+git clone https://github.com/makemefeelgr8/xray-16.git xray-android
+
+3. Create build folders
+
+cd xray-android && mkdir bin && cd bin
+
+4. Open android-build.sh file in root repository directory. Change SDK_CMAKE_VERSION and NDK_VERSION to the ones installed in your system. Refer to comments in android-build.sh for details on how to find them.
+
+5. Copy android-build.sh to the bin directory and make it executable.
+
+cp ../android-build.sh .
+chmod +x android-build.sh
+
+6. Configure project
+
+./android-build.sh
+
+7. Start building with the version of ninja from android sdk. Command will look like this (make sure you set your version in there):
+
+~/Android/Sdk/cmake/*version*/bin/ninja -j9 -v -k 3 
+Parameters: 
+*version* - your folder with cmake files
+-j - number of threads
+-v - verbose output
+-k - skip errors

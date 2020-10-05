@@ -1,3 +1,6 @@
+Android build manual: https://github.com/makemefeelgr8/xray-16/blob/xd_dev/manual.txt
+
+
 ![Open for everyone](OpenXRayCover.png)
 
 OpenXRay [![Discord](https://img.shields.io/discord/410170555619082240?label=Discord)](https://discord.gg/sjRMQwv) [![Supporters](https://opencollective.com/openxray/tiers/supporter/badge.svg?label=Supporter&color=brightgreen)](https://opencollective.com/openxray)
