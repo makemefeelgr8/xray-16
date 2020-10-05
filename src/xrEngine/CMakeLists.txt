@@ -14,6 +14,9 @@ include_directories(
     ${SDL_INCLUDE_DIRS}
     ${FREEIMAGE_INCLUDE_PATH}
     ${LOCKFILE_INCLUDE_DIR}
+    ${TBB_INCLUDE_DIRS}
+    ${THEORA_INCLUDE_DIR}
+    ${OGG_INCLUDE_DIR}
     )
 
 list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/./tntQAVI.cpp")
@@ -31,10 +34,15 @@ add_definitions(-DENGINE_BUILD)
 add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}__SOURCES} ${${PROJECT_NAME}__INCLUDES})
 
 set_target_properties(${PROJECT_NAME} PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "stdafx.h")
-cotire(${PROJECT_NAME})
+
+if(${CMAKE_SYSTEM_PROCESSOR} STREQUAL "aarch64")
+    message( "Disable cotire for aarch64" )
+else()
+    cotire(${PROJECT_NAME})
+endif()
 
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
-target_link_libraries(${PROJECT_NAME} xrCore xrMiscMath xrLuabind xrAPI xrSound xrScriptEngine xrNetServer ${LUA_LIBRARIES} ${THEORA_LIBRARY} ${OGG_LIBRARIES} xrCDB xrPhysics ${FREEIMAGE_LIBRARIES} openal ${LOCKFILE_LIBRARIES} ${SDL_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} xrCore xrMiscMath xrLuabind xrAPI xrSound xrScriptEngine xrNetServer ${LUA_LIBRARIES} ${THEORA_LIBRARY} ${OGG_LIBRARIES} xrCDB xrPhysics ${FREEIMAGE_LIBRARIES} openal ${LOCKFILE_LIBRARIES} ${SDL_LIBRARIES} ${TBB_LIBRARIES})
 
 install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} PERMISSIONS OWNER_READ OWNER_WRITE 
     GROUP_READ 

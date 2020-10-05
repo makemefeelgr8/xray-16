@@ -909,7 +909,14 @@ struct luajit
 
     static void allow_escape_sequences(bool allowed)
     {
-        lj_allow_escape_sequences(allowed ? 1 : 0);
+        #warning lj_allow_escape_sequences not implemented
+        #warning lj_allow_escape_sequences not implemented
+        #warning lj_allow_escape_sequences not implemented
+        #warning lj_allow_escape_sequences not implemented
+        #warning lj_allow_escape_sequences not implemented
+        #warning lj_allow_escape_sequences not implemented
+        #warning lj_allow_escape_sequences not implemented
+        //lj_allow_escape_sequences(allowed ? 1 : 0);
     }
 };
 

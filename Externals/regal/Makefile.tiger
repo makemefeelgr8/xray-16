@@ -1,0 +1,82 @@
+ifndef MAKEFILE_TIGER_INCLUDED
+MAKEFILE_TIGER_INCLUDED := 1
+
+.PHONY: tiger.bin tiger.clean
+
+include build/common.inc
+
+# Not supported for NaCL or emscripten - Revisit
+
+ifeq ($(filter nacl% emscripten%,$(SYSTEM)),)
+
+#
+# tiger
+#
+
+include Makefile.regal
+include Makefile.glut
+include Makefile.glew
+
+ifndef REGAL.SHARED
+$(error tiger needs Regal.)
+endif
+
+ifndef GLEW.SHARED
+$(error tiger needs GLEW.)
+endif
+
+all:: tiger.bin
+
+clean:: tiger.clean
+
+tiger.bin: bin/$(SYSTEM)/tiger
+
+tiger.clean:
+	$(RM) -r tmp/$(SYSTEM)/tiger/static
+	$(RM) -r bin/$(SYSTEM)/tiger
+
+TIGER.SRCS       += examples/tiger/nvpr_tiger.c
+TIGER.SRCS       += examples/tiger/tiger.c
+TIGER.SRCS       += examples/tiger/xform.c
+TIGER.SRCS.NAMES := $(notdir $(TIGER.SRCS))
+TIGER.OBJS       := $(addprefix tmp/$(SYSTEM)/tiger/static/,$(TIGER.SRCS.NAMES))
+TIGER.OBJS       := $(TIGER.OBJS:.c=.o)
+TIGER.DEPS       := $(TIGER.DEPS:.o=.d)
+TIGER.CFLAGS     := -Iinclude -Iexamples/tiger -DGLEW_NO_GLU=1
+TIGER.LIBS       += -Llib/$(SYSTEM)
+
+# use RegalGLUT, if possible
+
+ifdef GLUT.SHARED
+TIGER.LIBS       += -lRegalGLUT -lRegalGLU
+else
+TIGER.LIBS       +=  $(LDFLAGS.GLUT) $(LDFLAGS.GLU) $(LDFLAGS.X11)
+endif
+
+TIGER.LIBS       += -lRegalGLEW -lRegal
+TIGER.LIBS       += -lm
+
+-include $(TIGER.DEPS)
+
+tmp/$(SYSTEM)/tiger/static/%.o: examples/tiger/%.c
+	@mkdir -p $(dir $@)
+	$(LOG_CC)$(CCACHE) $(CC) $(TIGER.CFLAGS) $(CFLAGS) $(CFLAGS.SO) -o $@ -c $<
+
+TIGER.DEPEND :=
+TIGER.DEPEND += lib/$(SYSTEM)/$(REGAL.SHARED)
+
+ifdef GLUT.SHARED
+bin/$(SYSTEM)/tiger: lib/$(SYSTEM)/$(GLUT.SHARED) lib/$(SYSTEM)/$(GLU.SHARED)
+endif
+
+bin/$(SYSTEM)/tiger: lib/$(SYSTEM)/$(GLEW.SHARED) lib/$(SYSTEM)/$(REGAL.SHARED)
+
+bin/$(SYSTEM)/tiger: $(TIGER.OBJS)
+	@mkdir -p $(dir $@)
+	$(LOG_LD)$(CCACHE) $(LD) $(LDFLAGS.EXTRA) -o $@ $(TIGER.OBJS) $(TIGER.LIBS)
+ifneq ($(STRIP),)
+	$(LOG_STRIP)$(STRIP) -x $@
+endif
+
+endif
+endif

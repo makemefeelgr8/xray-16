@@ -16,6 +16,12 @@
 #define _sys_errlist sys_errlist
 #endif
 
+#if defined(XR_ARCHITECTURE_ARM64)
+#include <stdio.h>
+extern int _sys_nerr;
+extern __const char *__const _sys_errlist[];
+#endif
+
 void* FileDownload(pcstr fn, size_t* pdwSize = nullptr);
 void FileCompress(pcstr fn, pcstr sign, void* data, size_t size);
 void* FileDecompress(pcstr fn, pcstr sign, size_t* size = nullptr);

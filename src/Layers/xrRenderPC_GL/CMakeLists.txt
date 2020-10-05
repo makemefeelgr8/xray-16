@@ -19,6 +19,9 @@ include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/../../../Externals/gli
     ${CMAKE_CURRENT_SOURCE_DIR}/../../../Externals/gli/external/glm
     ${SDL_INCLUDE_DIRS}
+    ${GLEW_INCLUDE_DIR}
+    ${TBB_INCLUDE_DIRS}
+    ${FREEIMAGE_INCLUDE_PATH}
     )
 
 list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/../xrRender/HW.cpp")
@@ -58,7 +61,12 @@ add_definitions(-DXRRENDER_GL_EXPORTS -DUSE_OGL -DNO_XR_VDECLARATOR)
 add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}__SOURCES} ${${PROJECT_NAME}__INCLUDES})
 
 set_target_properties(${PROJECT_NAME} PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "stdafx.h")
-cotire(${PROJECT_NAME})
+
+if(${CMAKE_SYSTEM_PROCESSOR} STREQUAL "aarch64")
+    message( "Disable cotire for aarch64" )
+else()
+    cotire(${PROJECT_NAME})
+endif()
 
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
 target_link_libraries(${PROJECT_NAME} xrCore xrCDB xrEngine xrParticles xrScriptEngine xrAPI GL GLEW xrLuabind ${LUA_LIBRARIES})

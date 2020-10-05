@@ -1,0 +1,23 @@
+NAME = $(REGAL_NAME)
+CC = cc
+LD = cc
+RANLIB :=
+EXT.DYNAMIC = dylib
+CFLAGS.EXTRA = -dynamic -no-cpp-precomp -fno-common -fno-exceptions
+CFLAGS.EXTRA += -MMD
+PICFLAG = -fPIC
+LDFLAGS.EXTRA =
+ifneq (undefined, $(origin REGAL_APPLE_GLX))
+CFLAGS.EXTRA += -I/usr/X11R6/include -D'REGAL_APPLE_GLX'
+LDFLAGS.GL = -L/usr/X11R6/lib -lXmu -lXi -lGLU -lGL -lXext -lX11
+else
+LDFLAGS.AGL  = -framework AGL
+LDFLAGS.GL   = $(LDFLAGS.AGL) -framework OpenGL
+LDFLAGS.GLUT = -framework GLUT
+endif
+LDFLAGS.STATIC =
+LDFLAGS.DYNAMIC = -dynamiclib 
+WARN = -Wall -W -Wno-unused-parameter
+CFLAGS.DEBUG   = -g
+CFLAGS.RELEASE = -O3
+BIN.SUFFIX =

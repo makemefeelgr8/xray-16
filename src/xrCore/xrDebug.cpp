@@ -51,7 +51,12 @@ static BOOL bException = FALSE;
 #include <sys/ptrace.h>
 #include <cxxabi.h>
 #include <dlfcn.h>
+#if defined(XR_ARCHITECTURE_ARM64)
+// TODO: Implement backtracing for arm devices
+#include "fake_execinfo.h"
+#else
 #include <execinfo.h>
+#endif
 #endif
 #pragma comment(lib, "FaultRep.lib")
 

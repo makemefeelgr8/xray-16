@@ -23,6 +23,13 @@ include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Externals/mimalloc/include
     ${SDL_INCLUDE_DIRS}
     ${TBB_INCLUDE_DIRS}
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../Externals/tbb/include
+    ${PCRE_INCLUDE_DIR}
+    ${FREEIMAGE_INCLUDE_PATH}
+    ${LZO_INCLUDE_DIR}
+    ${CRYPTO++_INCLUDE_DIR}
+    ${THEORA_INCLUDE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/home/q/projects/xray-16/Externals/libtheora/include
 )
 
 list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/Memory/xrMemory_align.cpp")
@@ -53,7 +60,12 @@ add_definitions(-DXRCORE_EXPORTS -DGIT_INFO_CURRENT_COMMIT=${GIT_SHA1} -DGIT_INF
 add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}__SOURCES} ${${PROJECT_NAME}__INCLUDES})
 
 set_target_properties(${PROJECT_NAME} PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "stdafx.h")
-cotire(${PROJECT_NAME})
+
+if(${CMAKE_SYSTEM_PROCESSOR} STREQUAL "aarch64")
+    message( "Disable cotire for aarch64" )
+else()
+    cotire(${PROJECT_NAME})
+endif()
 
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
 
@@ -68,6 +80,7 @@ target_link_libraries(
     ${LZO_LIBRARIES}
     ${CRYPTO++_LIBRARIES}
     ${TBB_LIBRARIES}
+    ${THEORA_LIB_LIBRARIES}
 )
 
 install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} PERMISSIONS OWNER_READ OWNER_WRITE 

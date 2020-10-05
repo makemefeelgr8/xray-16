@@ -1,0 +1,32 @@
+NAME = $(REGAL_NAME)
+CC = cc
+CXX = c++
+LD = cc
+RANLIB :=
+# don't use abi-dumper by default
+# ABIDUMP = abi-dumper -bin-only -lver HEAD
+ABIDUMP =
+EXT.DYNAMIC = so
+PICFLAG = -fPIC
+M_ARCH ?= $(shell uname -m)
+ifeq (x86_64,${M_ARCH})
+LDFLAGS.EXTRA = -L/usr/X11R6/lib64
+LIBDIR = $(REGAL_DEST)/lib64
+else
+LDFLAGS.EXTRA = -L/usr/X11R6/lib
+LIBDIR = $(REGAL_DEST)/lib
+endif
+CFLAGS.EXTRA += -MMD
+LDFLAGS.X11 = -lXmu -lXi -lXext -lX11
+LDFLAGS.GL = -lGL
+LDFLAGS.GLU = -lRegalGLU
+LDFLAGS.GLUT = -lRegalGLUT
+LDFLAGS.STATIC =
+LDFLAGS.DYNAMIC = -shared
+LDFLAGS.STARTGROUP = -Wl,--start-group
+LDFLAGS.ENDGROUP   = -Wl,--end-group
+WARN = -Wall -Wno-uninitialized -Wno-unused-parameter
+# WARN += -Werror
+CFLAGS.DEBUG   = -g
+CFLAGS.RELEASE = -O2
+BIN.SUFFIX =

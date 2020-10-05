@@ -1,0 +1,81 @@
+ifndef MAKEFILE_REGALTEST_INCLUDED
+MAKEFILE_REGALTEST_INCLUDED := 1
+
+.PHONY: regaltest.bin regaltest.clean
+
+include build/common.inc
+
+# Not supported for Emscripten - Revisit
+
+ifeq ($(filter emscripten% nacl-pnacl,$(SYSTEM)),)
+
+include build/regaltest.inc
+
+#
+# regaltest
+#
+
+include Makefile.regal
+include Makefile.pcrelib
+include Makefile.glsloptlib
+include Makefile.gtest
+
+ifndef REGAL.STATIC
+$(error regaltest needs Regal.)
+endif
+
+ifndef GTEST.STATIC
+$(error regaltest needs google test.)
+endif
+
+all:: regaltest.bin
+
+clean:: regaltest.clean
+
+regaltest.bin: bin/$(SYSTEM)/regaltest$(BIN_EXTENSION)
+
+regaltest.clean:
+	$(RM) -r tmp/$(SYSTEM)/regaltest/static
+	$(RM) -r bin/$(SYSTEM)/regaltest$(BIN_EXTENSION)
+
+REGALTEST.SRCS       += $(REGALTEST.CXX)
+REGALTEST.SRCS.NAMES := $(notdir $(REGALTEST.SRCS))
+REGALTEST.OBJS       := $(addprefix tmp/$(SYSTEM)/regaltest/static/,$(REGALTEST.SRCS.NAMES))
+REGALTEST.OBJS       := $(REGALTEST.OBJS:.cpp=.o)
+REGALTEST.DEPS       := $(REGALTEST.DEPS:.o=.d)
+REGALTEST.CFLAGS     := -Isrc/googletest/include -Isrc/googlemock/include -Isrc/regal -Isrc/boost -Isrc/lookup3 -Isrc/pcre
+REGALTEST.LIBS       := -Llib/$(SYSTEM) $(LDFLAGS.X11) -lm
+
+ifeq ($(filter nacl%,$(SYSTEM)),)
+REGALTEST.LIBS += -ldl
+else
+REGALTEST.LIBS += -lnacl_io -lppapi -lppapi_gles2
+endif
+
+-include $(REGALTEST.DEPS)
+
+tmp/$(SYSTEM)/regaltest/static/%.o: tests/%.cpp
+	@mkdir -p $(dir $@)
+	$(LOG_CXX)$(CCACHE) $(CXX) $(REGAL.CFLAGS) $(REGALTEST.CFLAGS) $(CFLAGS) $(CFLAGS.SO) -o $@ -c $<
+
+bin/$(SYSTEM)/regaltest$(BIN_EXTENSION): $(REGALTEST.OBJS) lib/$(SYSTEM)/$(GTEST.STATIC) lib/$(SYSTEM)/$(REGAL.STATIC) lib/$(SYSTEM)/$(PCRE.STATIC) $(REGAL.SHARED.DEPEND)
+	@mkdir -p $(dir $@)
+ifdef APITRACE.STATIC
+	$(LOG_LD)$(CCACHE) $(LD) $(LDFLAGS.EXTRA) -o $@ $(REGALTEST.OBJS) $(LDFLAGS.STARTGROUP) lib/$(SYSTEM)/$(REGAL.STATIC) lib/$(SYSTEM)/$(APITRACE.STATIC) $(LDFLAGS.ENDGROUP) $(REGAL.SHARED.DEPEND) $(REGAL.LIBS) $(REGALTEST.LIBS) lib/$(SYSTEM)/$(PCRE.STATIC) lib/$(SYSTEM)/$(GTEST.STATIC) $(REGAL.LDFLAGS)
+else
+	$(LOG_LD)$(CCACHE) $(LD) $(LDFLAGS.EXTRA) -o $@ $(REGALTEST.OBJS) lib/$(SYSTEM)/$(REGAL.STATIC) lib/$(SYSTEM)/$(PCRE.STATIC) $(REGAL.SHARED.DEPEND) $(REGAL.LIBS) $(REGALTEST.LIBS) lib/$(SYSTEM)/$(GTEST.STATIC) $(REGAL.LDFLAGS)
+endif
+ifneq ($(STRIP),)
+	$(LOG_STRIP)$(STRIP) -x $@
+endif
+
+test: bin/$(SYSTEM)/regaltest$(BIN_EXTENSION)
+	@echo Running tests: $^
+ifeq ($(filter nacl%,$(SYSTEM)),)
+	$^
+else
+	"$(NACL_SDK_ROOT)/tools/sel_ldr.py" $^
+endif
+
+endif
+endif

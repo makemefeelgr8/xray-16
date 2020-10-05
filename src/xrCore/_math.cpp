@@ -18,13 +18,16 @@
 #elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
 #if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64)
 #include <x86intrin.h> // __rdtsc
-#elif defined(XR_ARCHITECTURE_ARM)
+#elif defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64)
 #include <sys/syscall.h>
 #include <linux/perf_event.h>
-#endif // defined(XR_ARCHITECTURE_ARM)
+#include <fenv.h>
+#endif // defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64)
 
 #ifdef XR_PLATFORM_LINUX
+#ifndef __ANDROID__
 #include <fpu_control.h>
+#endif
 #elif defined(XR_PLATFORM_FREEBSD)
 #include <sys/sysctl.h>
 #include <fenv.h>
@@ -52,10 +55,15 @@ typedef unsigned int fpu_control_t __attribute__((__mode__(__HI__)));
 #include "SDL.h"
 
 #if (defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64) || defined(XR_ARCHITECTURE_E2K)) && !defined(XR_COMPILER_MSVC)
-#define _FPU_EXTENDED 0
-#define _FPU_DOUBLE 0
+#define _FPU_EXTENDED 0x300
+#define _FPU_DOUBLE 0x200
 #define _FPU_SINGLE 0
 #define _FPU_RC_NEAREST 0
+#define _FPU_DEFAULT  0x037f
+// Disable FPU controls on Adroid
+#define _FPU_GETCW(x)
+#define _FPU_SETCW(x) 
+typedef __uint32_t fpu_control_t;   // FPCR, Floating-point Control Register.
 
 #if defined(XR_ARCHITECTURE_ARM)
 static class PerfInit

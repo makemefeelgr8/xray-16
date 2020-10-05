@@ -113,7 +113,12 @@ add_definitions(-DXRGAME_EXPORTS)
 add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}__SOURCES} ${${PROJECT_NAME}__INCLUDES})
 
 set_target_properties(${PROJECT_NAME} PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "StdAfx.h")
-cotire(${PROJECT_NAME})
+
+if(${CMAKE_SYSTEM_PROCESSOR} STREQUAL "aarch64")
+    message( "Disable cotire for aarch64" )
+else()
+    cotire(${PROJECT_NAME})
+endif()
 
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
 target_link_libraries(${PROJECT_NAME} xrCore xrEngine xrMiscMath xrLuabind xrAPI xrAICore xrUICore xrSound xrScriptEngine cximage xrGameSpy ${LUA_LIBRARIES} xrCDB xrPhysics xrNetServer ${SDL_LIBRARIES})

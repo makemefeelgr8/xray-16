@@ -18,5 +18,10 @@ add_library(${PROJECT_NAME} STATIC ${${PROJECT_NAME}__SOURCES} ${${PROJECT_NAME}
 set_property(TARGET ${PROJECT_NAME} PROPERTY POSITION_INDEPENDENT_CODE ON)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "pch.hpp")
-cotire(${PROJECT_NAME})
+
+if(${CMAKE_SYSTEM_PROCESSOR} STREQUAL "aarch64")
+    message( "Disable cotire for aarch64" )
+else()
+    cotire(${PROJECT_NAME})
+endif()
 

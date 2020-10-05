@@ -161,6 +161,12 @@ unsigned int query_processor_info(processor_info* pinfo)
 #ifdef XR_PLATFORM_WINDOWS
     ULONG_PTR pa_mask_save, sa_mask_stub = 0;
     GetProcessAffinityMask(GetCurrentProcess(), &pa_mask_save, &sa_mask_stub);
+#elif defined(XR_ARCHITECTURE_ARM64)
+    unsigned int pa_mask_save = 0;
+    cpu_set_t my_set;
+    CPU_ZERO(&my_set);
+    sched_setaffinity(pthread_self(), sizeof(cpu_set_t), &my_set);
+    pa_mask_save = CPU_COUNT(&my_set);
 #elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
     unsigned int pa_mask_save = 0;
     cpu_set_t my_set;

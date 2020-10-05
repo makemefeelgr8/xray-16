@@ -1,0 +1,19 @@
+NAME = $(REGAL_NAME)
+CC = cc
+LD = cc
+PICFLAG =
+LDFLAGS.EXTRA =
+LIBDIR =
+LDFLAGS.GL = -lXmu -lXi -lGLU -lGL -lXext -lX11
+LDFLAGS.GLUT = -lRegalGLUT
+LDFLAGS.STATIC = -Wl,-Bstatic
+LDFLAGS.DYNAMIC = -Wl,-Bdynamic
+WARN = -Wall -W
+CFLAGS.DEBUG   = -g
+CFLAGS.RELEASE = -O2
+BIN.SUFFIX =
+LIB.SONAME = lib$(NAME).so.$(SO_MAJOR)
+LIB.DEVLNK = lib$(NAME).so
+LIB.SHARED = lib$(NAME).so.$(SO_VERSION)
+LIB.STATIC = lib$(NAME).a
+LDFLAGS.SO = -shared -Wl,-soname=$(LIB.SONAME)
